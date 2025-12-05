@@ -1,0 +1,186 @@
+/* base.css - Global, layout, tags, and inputs */
+/* --- Global & Page --- */
+body {
+    margin: 0;
+    padding-bottom: 500px;
+    display: block;
+    background: linear-gradient(to right, rgb(255, 193, 78), green);
+    background-attachment: fixed;
+    background-size: 200% 200%;
+}
+
+/* Top navbar */
+.topContainer {
+    display: flex;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    justify-content: center;
+    align-items: center;
+    margin: 0px;
+    padding: 18px 20px;
+    background: #6a11cb; /* match tag color */
+    border-bottom: 1px solid rgba(106,17,203,0.18);
+    box-shadow: 0 4px 18px rgba(106,17,203,0.12);
+    z-index: 60;
+}
+/* Page Title styling */
+#PageTitle {
+    color: white;
+    font-size: 40px;
+    /* use Charm (Cadson Demak) with sensible fallbacks for a sharp nav title */
+    font-family: 'Charm', Inter, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-weight: 700;
+    letter-spacing: 0.6px;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-shadow: 0 1px 0 rgba(0,0,0,0.12);
+}
+#inputs {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    column-gap: 12px;
+    row-gap: 8px;
+}
+
+/* When narrow, stack inputs and buttons vertically for easier interaction */
+@media (max-width: 880px) {
+    #inputs { grid-template-columns: 1fr; }
+    /* place Send button below the name input */
+    #inputs > :nth-child(2) { grid-column: 1; justify-self: start; }
+    #inputs > :nth-child(7) { grid-column: 1; justify-self: start; }
+}
+
+/* Page layout grid */
+.container {
+    position: relative;
+    top: 100px;
+    display: grid;
+    /* Use minmax(0,1fr) so columns can shrink below their content's min-size and remain equal */
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    /* Keep row heights automatic so rows don't expand to match the tallest row */
+        grid-auto-rows: auto;
+        align-items: stretch; /* children stretch to equalize vertical space */
+    gap: 20px;
+    padding: 20px;
+}
+
+/* Allow grid children to shrink (prevents one column from being larger than others due to min-content) */
+.container > * { min-width: 0; }
+
+/* Tags moved to panels.css */
+
+/* --- Inputs & Controls --- */
+input[type="text"], textarea {
+    width: 100%;
+    max-width: 100%;
+    padding: 8px 12px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    border: 1px solid rgba(0,0,0,0.12);
+    border-radius: 8px;
+    background: #ffffffee;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    transition: box-shadow 160ms ease, border-color 160ms ease, transform 120ms ease;
+    font-size: 14px;
+    outline: none;
+    box-sizing: border-box;
+}
+
+input[type="text"]:focus, textarea:focus {
+    border-color: #6a11cb;
+    box-shadow: 0 6px 18px rgba(106,17,203,0.12);
+    transform: translateY(-1px);
+}
+
+textarea {
+    min-height: 80px;
+    resize: vertical;
+}
+
+button {
+    background: white;
+    border-radius: 2px;
+    padding: 5px 10px;
+    margin: 5px;
+    border-radius: 5px;
+    color: green;
+}
+
+button:hover {
+    color: white;
+    background: green;
+}
+
+#inputs {
+    background: #6a11cb;
+    border-color: #6a11cb;
+    border-radius: 2px;
+    padding: 10px 5px;
+    margin: 20px;
+    border-radius: 5px;
+}
+
+#inputs {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    column-gap: 12px;
+    row-gap: 8px;
+}
+
+#inputs > :nth-child(1) { grid-column: 1; }
+#inputs > :nth-child(2) { grid-column: 2; justify-self: end; }
+#inputs > :nth-child(3) { display: none; }
+#inputs > :nth-child(4) { grid-column: 1 / -1; }
+#inputs > :nth-child(5) { display: none; }
+#inputs > :nth-child(6) { grid-column: 1; }
+#inputs > :nth-child(7) { grid-column: 2; justify-self: end; }
+
+#inputs button { margin: 0; }
+
+/* Responsive: stack panels on small screens */
+@media (max-width: 880px) {
+    .container { grid-template-columns: 1fr; }
+    .top-left, .top-right { grid-column: span 12; }
+    /* make inputs stack in narrow screens */
+    #inputs { grid-template-columns: 1fr; }
+    /* Ensure buttons move under their related inputs and center-align */
+    /* Name 'Send' button (2) and Tag 'New Tag' button (7) */
+    #inputs > :nth-child(2),
+    #inputs > :nth-child(7) {
+        grid-column: 1 / -1;
+        justify-self: center;
+        align-self: center;
+        width: auto;
+        margin-top: 8px;
+    }
+    /* ensure all main containers stack and take full width */
+    .container > * { width: 100%; }
+    /* Ensure grid items stretch vertically and maintain consistent heights when stacked */
+    .container { grid-auto-rows: auto; }
+}
+
+/* Medium screens - adjust cards and grid columns */
+@media (max-width: 1150px) {
+    /* make notes slightly larger min size to avoid overly tiny notes */
+    .note-grid { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); }
+}
+
+/* Ensure the top panels occupy equal width (6/12 columns each) on wider viewports.
+   This forces `.top-left` and `.top-right` to share the row evenly until the
+   responsive breakpoint where they stack. */
+@media (min-width: 881px) {
+    .top-left { grid-column: 1 / 7; }
+    .top-right { grid-column: 7 / 13; }
+}
+
+/* Small screens - further collapse layout and reduce paddings */
+@media (max-width: 600px) {
+    #PageTitle { font-size: 28px; }
+    .container { padding: 12px; gap: 12px; }
+    .top-left, .top-right { padding: 12px; min-height: 120px; }
+    .note-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; }
+    .note { min-height: 120px; }
+}

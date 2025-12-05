@@ -1,0 +1,16 @@
+For the To-Do List:
+
+1. Make addition box at the top to add tasks
+1a. User inputs task name
+1b. Tasks also has edit button that expands the task and allows the User to cross out tags and rewrite name
+
+2. Expand on it by giving it tags.
+2a. Make additional input box to add tags.
+2b. Maybe add (time or date) and organize accordingly
+
+3. Make grid and fill with tasks.
+3a. It is a regular grid, but can be changed to add columns on the right if needed
+
+4. Create columns linked to specific tags. 
+4a. When User clicks on Tags, A column pops up(colored) fills with tasks that has the tags
+4b. The user can delete the column if needed. 
