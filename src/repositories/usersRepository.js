@@ -1,23 +1,64 @@
-import db from "../db.js";
+// usersRepository.js
+import supabase from "../supabaseClient.js";
+import bcrypt from "bcrypt";
 
-export function createUser(email, passwordHash) {
-  const stmt = db.prepare(`
-    INSERT INTO users (email, password_hash)
-    VALUES (?, ?)
-  `);
+/**
+ * Create a new user
+ * @param {string} email
+ * @param {string} passwordHash - hashed password
+ * @returns {Promise<{id: number, email: string}>}
+ */
+export async function createUser(email, passwordHash) {
+  const { data, error } = await supabase
+    .from("users")
+    .insert({
+      email,
+      password_hash: passwordHash,
+    })
+    .select()
+    .single(); // returns the created row
 
-  const result = stmt.run(email, passwordHash);
-  return { id: result.lastInsertRowid, email };
+  if (error) throw error;
+
+  return { id: data.id, email: data.email };
 }
 
-export function findUserByEmail(email) {
-  return db
-    .prepare("SELECT * FROM users WHERE email = ?")
-    .get(email);
+/**
+ * Find a user by email
+ * @param {string} email
+ * @returns {Promise<{id: number, email: string, password_hash: string} | null>}
+ */
+export async function findUserByEmail(email) {
+  const { data, error } = await supabase
+    .from("users")
+    .select("*")
+    .eq("email", email)
+    .single(); // get single row
+
+  if (error) {
+    if (error.code === "PGRST116") return null; // no rows found
+    throw error;
+  }
+
+  return data;
 }
 
-export function findUserById(id) {
-  return db
-    .prepare("SELECT id, email FROM users WHERE id = ?")
-    .get(id);
+/**
+ * Find a user by ID
+ * @param {number} id
+ * @returns {Promise<{id: number, email: string} | null>}
+ */
+export async function findUserById(id) {
+  const { data, error } = await supabase
+    .from("users")
+    .select("id, email")
+    .eq("id", id)
+    .single();
+
+  if (error) {
+    if (error.code === "PGRST116") return null;
+    throw error;
+  }
+
+  return data;
 }
