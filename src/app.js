@@ -34,20 +34,21 @@ app.use(session({
   }
 }));
 
-app.use((req, res, next) => {
+app.use(async (req, res, next) => {
   req.user = null;
   if (req.session?.userId) {
-    req.user = findUserById(req.session.userId);
+    req.user = await findUserById(req.session.userId);
   }
   next();
 });
+
 
 // routes
 app.use("/api/auth", authRoutes);
 app.use("/api/todos", todoRoutes);
 
-// SPA fallback
-app.get("*", (req, res) => {
+// SPA fallback 
+app.get("/*", (req, res) => {
   res.sendFile(path.join(__dirname, "../public/index.html"));
 });
 
