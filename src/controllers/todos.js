@@ -1,5 +1,5 @@
 import db from "../db.js";
-import supabase from "../supabaseClient.js";
+import { supabase } from "../supabaseClient.js";
 
 
 export async function getTodos(req, res) {
@@ -104,4 +104,5 @@ export function updateTodo(req, res) {
 
   res.json({ success: true });
 }
+
 
