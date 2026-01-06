@@ -6,24 +6,30 @@ import { createUser, findUserByEmail, findUserById } from "../repositories/users
 const router = express.Router();
 
 // ===== REGISTER =====
-router.post("/register", async (req, res) => {
+export async function register(req, res) {
   try {
     const { email, password } = req.body;
-    if (!email || !password) return res.status(400).json({ message: "Missing email or password" });
+    console.log("Register attempt:", email);
 
-    const existing = await findUserByEmail(email);
-    if (existing) return res.status(400).json({ message: "Email already registered" });
+    const existingUser = await findUserByEmail(email);
+    console.log("Existing user:", existingUser);
 
-    const hash = await bcrypt.hash(password, 10);
-    const user = await createUser(email, hash);
+    if (existingUser) {
+      return res.status(400).json({ message: "Email already registered" });
+    }
+
+    const passwordHash = await bcrypt.hash(password, 10);
+    const user = await createUser(email, passwordHash);
+    console.log("Created user:", user);
 
     req.session.userId = user.id;
     res.status(201).json({ id: user.id, email: user.email });
   } catch (err) {
-    console.error("REGISTER ERROR:", err);
-    res.status(500).json({ message: "Internal server error", details: err.message });
+    console.error("Register error:", err);  // ✅ shows exact Supabase error
+    res.status(500).json({ message: "Internal server error" });
   }
-});
+}
+
 
 // ===== LOGIN =====
 router.post("/login", async (req, res) => {
@@ -71,6 +77,7 @@ try {
 }
 
 export default router;
+
 
 
 
