@@ -25,19 +25,28 @@ export async function register(req, res) {
     const { email, password } = req.body;
     if (!email || !password) return res.status(400).json({ error: "Email and password required" });
 
-    const existing = await findUserByEmail(email);
-    if (existing) return res.status(400).json({ error: "User already exists" });
+    const hashed = await bcrypt.hash(password, 10);
 
-    const passwordHash = await bcrypt.hash(password, 10);
-    const user = await createUser(email, passwordHash);
+    const { data, error } = await supabase
+      .from("Users")
+      .insert({ email, password_hash: hashed })
+      .select()
+      .single();
 
-    req.session.userId = user.id; // auto-login after registration
-    res.json({ id: user.id, email: user.email });
+    if (error) {
+      console.error("Supabase insert error:", error);
+      return res.status(400).json({ error: error.message });
+    }
+
+    req.session.userId = data.id;
+
+    res.json({ id: data.id, email: data.email });
   } catch (err) {
     console.error("Register error:", err);
-    res.status(500).json({ error: "Internal Server Error" });
+    res.status(500).json({ error: "Server error" });
   }
 }
+
 
 /**
  * Login
@@ -72,6 +81,7 @@ export async function me(req, res) {
 
   res.json(user);
 }
+
 
 
 
