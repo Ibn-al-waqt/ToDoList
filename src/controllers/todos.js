@@ -2,7 +2,8 @@
 import {
   getTodosByUser,
   createTodo as createTodoRepo,
-  deleteTodo as deleteTodoRepo
+  deleteTodo as deleteTodoRepo,
+  updateTodo
 } from "../repositories/todosRepository.js";
 
 /**
@@ -10,6 +11,9 @@ import {
  */
 export async function getTodos(req, res) {
   try {
+    if (!req.session || !req.session.userId) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
     const userId = req.session.userId;
     const todos = await getTodosByUser(userId);
     res.json(todos);
@@ -24,10 +28,15 @@ export async function getTodos(req, res) {
  */
 export async function createTodo(req, res) {
   try {
+    if (!req.session || !req.session.userId) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
     const userId = req.session.userId;
+    
     const { title, content, tags, due_date } = req.body;
+    const todoTags = Array.isArray(tags) ? tags : [];
+    await createTodoRepo(userId, title, content, todoTags, due_date);
 
-    await createTodoRepo(userId, title, content, tags, due_date);
     const todos = await getTodosByUser(userId);
     res.status(201).json(todos);
   } catch (err) {
@@ -41,6 +50,9 @@ export async function createTodo(req, res) {
  */
 export async function deleteTodo(req, res) {
   try {
+    if (!req.session || !req.session.userId) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
     const userId = req.session.userId;
     const todoId = parseInt(req.params.id, 10);
 
@@ -57,14 +69,19 @@ export async function deleteTodo(req, res) {
  * PUT /:id
  * Optional: Update fields like title, content, tags, due_date
  */
-export async function updateTodo(req, res) {
+export async function updateTodoHandler(req, res) {
   try {
+    if (!req.session || !req.session.userId) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
     const userId = req.session.userId;
     const todoId = parseInt(req.params.id, 10);
-    const updates = req.body; // expects { title?, content?, tags?, due_date? }
 
-    // You need to implement updateTodo in repository if needed
-    const { updateTodo } = await import("../repositories/todosRepository.js");
+    const updates = {
+      ...req.body,
+      tags: Array.isArray(req.body.tags) ? req.body.tags : []
+    };
+
     await updateTodo(todoId, userId, updates);
 
     const todos = await getTodosByUser(userId);
@@ -74,3 +91,4 @@ export async function updateTodo(req, res) {
     res.status(500).json({ message: "Internal server error" });
   }
 }
+
