@@ -25,18 +25,20 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, "../public")));
 
 // Session setup
+app.set('trust proxy', 1); // Render uses a reverse proxy
 app.use(session({
   name: "sid",
-  secret: process.env.SESSION_SECRET || "replace_me",
+  secret: process.env.SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
   cookie: {
     httpOnly: true,
     sameSite: "lax",
-    secure: process.env.NODE_ENV === "production", // ✅ only secure in prod (HTTPS)
+    secure: process.env.NODE_ENV === 'production',
+    maxAge: 1000 * 60 * 60 * 24 * 7 // 7 days
   }
 }));
-;
+
 
 // Hydrate user from session
 app.use(async (req, res, next) => {
@@ -66,6 +68,7 @@ app.use((req, res) => {
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+
 
 
 
