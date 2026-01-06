@@ -1,29 +1,37 @@
-// todosRepository.js
+// repositories/todosRepository.js
 import { supabase } from "../supabaseClient.js";
 
 /**
  * Get all todos for a user, ordered by created_at descending
- * @param {number} userId
+ * @param {string} userId
  * @returns {Promise<Array>}
  */
 export async function getTodosByUser(userId) {
   const { data, error } = await supabase
     .from("todos")
     .select("id, title, content, tags, due_date, created_at, updated_at")
-    .eq("user_id", userId)
+    .eq("user_id", userId) // userId is string (UUID)
     .order("created_at", { ascending: false });
 
   if (error) throw error;
-  // Supabase stores arrays as JSON strings sometimes, so parse tags if needed
-  return data.map(todo => ({
+
+  return (data || []).map(todo => ({
     ...todo,
-    tags: todo.tags ? JSON.parse(todo.tags) : [],
+    tags: todo.tags ? safeParse(todo.tags) : [],
   }));
+}
+
+function safeParse(str) {
+  try {
+    return JSON.parse(str);
+  } catch {
+    return [];
+  }
 }
 
 /**
  * Create a new todo
- * @param {number} userId
+ * @param {string} userId
  * @param {string} title
  * @param {string} content
  * @param {Array} tags
@@ -46,7 +54,7 @@ export async function createTodo(userId, title, content, tags = [], dueDate = nu
 /**
  * Delete a todo by id and userId
  * @param {number} id
- * @param {number} userId
+ * @param {string} userId
  */
 export async function deleteTodo(id, userId) {
   const { error } = await supabase
@@ -58,6 +66,12 @@ export async function deleteTodo(id, userId) {
   if (error) throw error;
 }
 
+/**
+ * Update a todo by id and userId
+ * @param {number} id
+ * @param {string} userId
+ * @param {Object} updates - { title?, content?, tags?, due_date? }
+ */
 export async function updateTodo(id, userId, updates) {
   const updateData = { ...updates };
   if (updates.tags) updateData.tags = JSON.stringify(updates.tags);
