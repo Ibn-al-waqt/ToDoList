@@ -1,25 +1,23 @@
-// auth.js
+// controllers/auth.js
 import bcrypt from "bcrypt";
-import { createUser, findUserByEmail, findUserById } from "../repositories/usersRepository.js";
-import { supabase } from "../supabaseClient.js"; // make sure path is correct
+import supabase from "../supabaseClient.js";
 
-export async function testSupabase(req, res) {
-  try {
-    const { data, error } = await supabase.from("Users").select("*").limit(1);
-    if (error) {
-      console.error("Supabase test error:", error);
-      return res.status(500).json({ error: error.message });
-    }
-    res.json(data);
-  } catch (err) {
-    console.error("Unexpected Supabase error:", err);
-    res.status(500).json({ error: "Unexpected error" });
-  }
+// ----------------------
+// Helper to get user by email
+async function findUserByEmail(email) {
+  const { data, error } = await supabase
+    .from("Users")
+    .select("*")
+    .eq("email", email)
+    .limit(1)
+    .single();
+
+  if (error && error.code !== "PGRST116") throw error; // ignore "no rows" code
+  return data || null;
 }
 
-/**
- * Register new user
- */
+// ----------------------
+// REGISTER
 export async function register(req, res) {
   try {
     const { email, password } = req.body;
@@ -27,34 +25,37 @@ export async function register(req, res) {
       return res.status(400).json({ error: "Email and password are required" });
     }
 
-    const hashed = await bcrypt.hash(password, 10);
+    // check if email already exists
+    const existing = await findUserByEmail(email);
+    if (existing) {
+      return res.status(400).json({ error: "Email already registered" });
+    }
 
-    const { data, error } = await supabase
-      .from('Users') // matches your table
-      .insert({ email, password_hash: hashed })
+    const password_hash = await bcrypt.hash(password, 10);
+
+    const { data: newUser, error } = await supabase
+      .from("Users")
+      .insert({ email, password_hash })
       .select()
       .single();
 
     if (error) {
-      console.error('Supabase insert error:', error);
-      return res.status(400).json({ error: error.message });
+      console.error("Supabase insert error:", error);
+      return res.status(500).json({ error: "Failed to register user" });
     }
 
-    // set session
-    req.session.userId = data.id;
+    // Set session
+    req.session.userId = newUser.id;
 
-    res.json({ id: data.id, email: data.email });
+    return res.status(200).json({ id: newUser.id, email: newUser.email });
   } catch (err) {
-    console.error('Register error:', err);
-    res.status(500).json({ error: 'Server error' });
+    console.error("Register error:", err);
+    return res.status(500).json({ error: "Internal server error" });
   }
 }
 
-
-
-/**
- * Login
- */
+// ----------------------
+// LOGIN
 export async function login(req, res) {
   try {
     const { email, password } = req.body;
@@ -66,33 +67,34 @@ export async function login(req, res) {
     const match = await bcrypt.compare(password, user.password_hash);
     if (!match) return res.status(401).json({ error: "Invalid credentials" });
 
+    // Set session
     req.session.userId = user.id;
-    res.json({ id: user.id, email: user.email });
+
+    return res.status(200).json({ id: user.id, email: user.email });
   } catch (err) {
     console.error("Login error:", err);
-    res.status(500).json({ error: "Internal Server Error" });
+    return res.status(500).json({ error: "Internal server error" });
   }
 }
 
-/**
- * Current user info
- */
+// ----------------------
+// GET CURRENT USER
 export async function me(req, res) {
-  if (!req.session.userId) return res.status(401).json({ error: "Not logged in" });
+  try {
+    if (!req.session?.userId) return res.status(401).json({ error: "Not logged in" });
 
-  const user = await findUserById(req.session.userId);
-  if (!user) return res.status(401).json({ error: "Not logged in" });
+    const { data: user, error } = await supabase
+      .from("Users")
+      .select("*")
+      .eq("id", req.session.userId)
+      .limit(1)
+      .single();
 
-  res.json(user);
+    if (error) return res.status(500).json({ error: "Failed to fetch user" });
+    return res.status(200).json({ id: user.id, email: user.email });
+  } catch (err) {
+    console.error("/me error:", err);
+    return res.status(500).json({ error: "Internal server error" });
+  }
 }
-
-
-
-
-
-
-
-
-
-
 
