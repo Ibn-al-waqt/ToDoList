@@ -63,6 +63,14 @@ router.get("/me", async (req, res) => {
   }
 });
 
+try {
+  const user = await findUserByEmail(email);
+  console.log("Fetched user:", user);
+} catch (err) {
+  console.error("Supabase error:", err);
+}
+
 export default router;
+
 
 
