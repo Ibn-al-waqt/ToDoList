@@ -28,7 +28,7 @@ export async function register(req, res) {
     const hashed = await bcrypt.hash(password, 10);
 
     const { data, error } = await supabase
-      .from("Users")
+      .from("Users") // matches your table
       .insert({ email, password_hash: hashed })
       .select()
       .single();
@@ -38,6 +38,7 @@ export async function register(req, res) {
       return res.status(400).json({ error: error.message });
     }
 
+    // set session cookie
     req.session.userId = data.id;
 
     res.json({ id: data.id, email: data.email });
@@ -46,6 +47,7 @@ export async function register(req, res) {
     res.status(500).json({ error: "Server error" });
   }
 }
+
 
 
 /**
@@ -81,6 +83,7 @@ export async function me(req, res) {
 
   res.json(user);
 }
+
 
 
 
