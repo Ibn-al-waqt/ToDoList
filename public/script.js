@@ -175,14 +175,18 @@ async function initApp() {
 
 // Fetch todos from backend API
 async function fetchTodos() {
-  const res = await fetch("/api/todos", { credentials: "include"});
+  const res = await fetch("/api/todos", { credentials: "include" });
   if (res.status === 401) {
-    notesState = [];
+    notesState = []; // ensure it's an array
+    renderNotesFromState();
     return;
   }
-  notesState = await res.json();
+
+  const data = await res.json();
+  notesState = Array.isArray(data) ? data : [];
   renderNotesFromState();
 }
+
 
 async function createTodo(todo) {
   await fetch(API_BASE_URL, {
@@ -972,6 +976,7 @@ document.addEventListener("click", () => {
 
 loginPopup.addEventListener("click", e => e.stopPropagation());
 userPopup.addEventListener("click", e => e.stopPropagation());
+
 
 
 initApp();
