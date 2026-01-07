@@ -110,30 +110,65 @@ function showRegisterForm() {
 showLoginBtn.addEventListener("click", showLoginForm);
 showRegisterBtn.addEventListener("click", showRegisterForm);
 
+// -------- SIGNUP --------
 registerSubmit.addEventListener("click", async () => {
   const email = document.getElementById("registerEmail").value.trim();
   const password = document.getElementById("registerPassword").value.trim();
 
   if (!email || !password) {
-    alert("Please enter email and password (6+ chars)");
+    alert("Please enter email and password");
     return;
   }
 
-  const { data, error } = await supabase.auth.signUp({
-    email,
-    password
-  });
+  try {
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password
+    });
 
-  if (error) {
-    alert(`Registration failed: ${error.message}`);
-    return;
+    if (error) {
+      alert("Registration failed: " + error.message);
+      return;
+    }
+
+    loginPopup.classList.add("hidden");
+    setLoggedInUI(data.user); // update UI
+    await fetchTodos();        // fetch user notes
+  } catch (err) {
+    console.error(err);
+    alert("Unexpected error during signup");
   }
-
-  loginPopup.classList.add("hidden");
-  setLoggedInUI(data.user);
-  await fetchTodos();
 });
 
+// -------- LOGIN --------
+loginSubmit.addEventListener("click", async () => {
+  const email = document.getElementById("loginEmail").value.trim();
+  const password = document.getElementById("loginPassword").value.trim();
+
+  if (!email || !password) {
+    alert("Please enter email and password");
+    return;
+  }
+
+  try {
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password
+    });
+
+    if (error) {
+      alert("Login failed: " + error.message);
+      return;
+    }
+
+    loginPopup.classList.add("hidden");
+    setLoggedInUI(data.user); // update UI
+    await fetchTodos();        // fetch user notes
+  } catch (err) {
+    console.error(err);
+    alert("Unexpected error during login");
+  }
+});
 
 
 
@@ -236,28 +271,6 @@ function updateNotesVisibility() {
     }
 
     card.style.display = (tagsMatch && searchMatch) ? '' : 'none';
-  });
-}
-
-
-if (loginSubmit) {
-  loginSubmit.addEventListener("click", async () => {
-    const email = document.getElementById("loginEmail").value;
-    const password = document.getElementById("loginPassword").value;
-
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password
-    });
-
-    if (error) {
-      alert("Login failed");
-      return;
-    }
-
-    loginPopup.classList.add("hidden");
-    setLoggedInUI(data.user);
-    await fetchTodos();
   });
 }
 
@@ -921,6 +934,7 @@ userPopup.addEventListener("click", e => e.stopPropagation());
 document.addEventListener('DOMContentLoaded', () => {
   initExistingNotes();
 });
+
 
 
 
