@@ -62,6 +62,7 @@ const API_BASE_URL = "/api";
 // ================= API =================
 // Load user info on page load
 
+// check auth
 async function checkAuthAndUpdateUI() {
   const { data: { user } } = await supabase.auth.getUser();
 
@@ -81,9 +82,8 @@ function setLoggedInUI(user) {
   userEmailDiv.classList.remove("hidden");
   userEmailDiv.textContent = user.email;
 
-  // 🔓 show protected sections
-  if (noteCreationSection) noteCreationSection.classList.remove("hidden");
-  if (allTagsSection) allTagsSection.classList.remove("hidden");
+  noteCreationSection.classList.remove("hidden");
+  allTagsSection.classList.remove("hidden");
 }
 
 function setLoggedOutUI() {
@@ -92,10 +92,10 @@ function setLoggedOutUI() {
   userEmailDiv.textContent = "";
   userPopup.classList.add("hidden");
 
-  // 🔒 hide protected sections
-  if (noteCreationSection) noteCreationSection.classList.add("hidden");
-  if (allTagsSection) allTagsSection.classList.add("hidden");
+  noteCreationSection.classList.add("hidden");
+  allTagsSection.classList.add("hidden");
 }
+
 
 function showLoginForm() {
   loginForm.classList.remove("hidden");
@@ -934,6 +934,7 @@ userPopup.addEventListener("click", e => e.stopPropagation());
 document.addEventListener('DOMContentLoaded', () => {
   initExistingNotes();
 });
+
 
 
 
