@@ -1,4 +1,4 @@
-import { getTodosByUser } from "../repositories/todosRepository.js";
+import { getTodosByUser } from "./repositories/todosRepository.js";
 
 export async function handler(event, context) {
   if (event.httpMethod !== "GET") {
