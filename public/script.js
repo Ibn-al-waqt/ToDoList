@@ -73,16 +73,32 @@ const API_BASE_URL = "/api";
 
 // check auth
 async function checkAuthAndUpdateUI() {
-  const { data: { user } } = await supabase.auth.getUser();
+  try {
+    // Get the current session
+    const { data, error } = await supabase.auth.getSession();
+    if (error) throw error;
 
-  if (!user) {
+    const session = data.session;
+
+    if (!session) {
+      // No user logged in
+      setLoggedOutUI();
+      clearUserState();
+      return;
+    }
+
+    // Get user info
+    const { user } = session;
+    setLoggedInUI(user);
+
+    // Fetch notes for this user
+    await fetchTodos();
+
+  } catch (err) {
+    console.error("Auth check failed:", err.message);
     setLoggedOutUI();
     clearUserState();
-    return;
   }
-
-  setLoggedInUI(user);
-  await fetchTodos();
 }
 
 
@@ -947,6 +963,7 @@ userPopup.addEventListener("click", e => e.stopPropagation());
 document.addEventListener('DOMContentLoaded', () => {
   initExistingNotes();
 });
+
 
 
 
