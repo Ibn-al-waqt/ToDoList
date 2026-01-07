@@ -40,16 +40,8 @@ const allTagsSection = document.getElementById("allTagsSection");
 const noteDateInput = document.getElementById("noteDate");
 const supabase = window.supabase;
 
-// In your main JS (index.js or script.js)
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.getRegistrations().then(registrations => {
-    for (let reg of registrations) {
-      reg.unregister();
-      console.log('Service worker unregistered:', reg);
-    }
-  });
-}
-
+const SUPABASE_URL = "https://sazdtrcayjljgmihilkj.supabase.co";  // replace with your Supabase URL
+const SUPABASE_ANON_KEY = "sb_publishable_8PjevXnceWHX2i_xoB-M7g_UYzHxq5c"; // replace with your public anon key
 
 //import { supabase } from "./supabaseClientBrowser.js";
 // active filter tags (multi-select) - notes must contain ALL tags in this set to be shown
@@ -963,6 +955,17 @@ userPopup.addEventListener("click", e => e.stopPropagation());
 document.addEventListener('DOMContentLoaded', () => {
   initExistingNotes();
 });
+
+// 7️⃣ On page load, check session
+async function checkSession() {
+  const { data } = await supabase.auth.getSession();
+  if (data.session) {
+    showUser(data.session.user);
+  }
+}
+
+document.addEventListener("DOMContentLoaded", checkSession);
+
 
 
 
