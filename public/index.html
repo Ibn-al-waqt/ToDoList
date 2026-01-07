@@ -90,7 +90,7 @@
   // Use the global Supabase object from the CDN
   const supabaseUrl = "https://sazdtrcayjljgmihilkj.supabase.co";
   const supabaseKey = "sb_publishable_8PjevXnceWHX2i_xoB-M7g_UYzHxq5c"; // replace with your anon key
-  const supabase = Supabase.createClient(supabaseUrl, supabaseKey);
+  const supabase = supabase.createClient(supabaseUrl, supabaseKey);
 </script>
 
 <!-- 3. Main script -->
@@ -98,6 +98,7 @@
 
 </body>
 </html>
+
 
 
 
