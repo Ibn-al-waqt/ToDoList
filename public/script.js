@@ -62,16 +62,19 @@ let guestNotes = [];
 loginPopup.addEventListener("click", e => e.stopPropagation());
 loginPopup.addEventListener("mousedown", e => e.stopPropagation());
 
-const API_BASE_URL = "https://todolist-1-p5d8.onrender.com";
-// Base URL for backend API (deployed on Render)
-const API_BASE_URL = "/api/todos";
+const API_BASE_URL = "/.netlify/functions/todos";
+
 
 // ================= API =================
 // Load user info on page load
 
 async function checkAuthAndUpdateUI() {
   try {
-    const res = await fetch("/api/auth/me", { credentials: "include" });
+    const userId = localStorage.getItem("userId");
+const res = await fetch("/.netlify/functions/auth-me", {
+  headers: { "x-user-id": userId || "" }
+});
+
 
     if (!res.ok) throw new Error();
 
@@ -122,24 +125,24 @@ registerSubmit.addEventListener("click", async () => {
   const email = document.getElementById("registerEmail").value;
   const password = document.getElementById("registerPassword").value;
 
-  const res = await fetch("/api/auth/register", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email, password })
-  });
+  const res = await fetch("/.netlify/functions/auth-register", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ email, password })
+});
 
-  if (!res.ok) {
-    alert("Registration failed");
-    return;
-  }
+// auto-login
+const loginRes = await fetch("/.netlify/functions/auth-login", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ email, password })
+});
 
-  // auto-login
-  const loginRes = await fetch("/api/auth/login", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email, password }),
-    credentials: "include"
-  });
+if (loginRes.ok) {
+  const data = await loginRes.json();
+  localStorage.setItem("userId", data.userId); // store ID for future requests
+}
+
 
   if (!loginRes.ok) {
     alert("Registered, but login failed");
@@ -178,7 +181,10 @@ async function initApp() {
 
 // Fetch todos from backend API
 async function fetchTodos() {
-  const res = await fetch("/api/todos", { credentials: "include" });
+  const userId = localStorage.getItem("userId");
+const res = await fetch(API_BASE_URL, {
+  headers: { "x-user-id": userId || "" }
+});
   if (res.status === 401) {
     notesState = []; // ensure it's an array
     renderNotesFromState();
@@ -192,27 +198,40 @@ async function fetchTodos() {
 
 
 async function createTodo(todo) {
-  await fetch(API_BASE_URL, {
-    method: "POST",
-    credentials: "include",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(todo)
-  });
+  const userId = localStorage.getItem("userId");
+await fetch(API_BASE_URL, {
+  method: "POST",
+  headers: { 
+    "Content-Type": "application/json",
+    "x-user-id": userId || ""
+  },
+  body: JSON.stringify(todo)
+});
+
   fetchTodos();
 }
 
 async function deleteTodo(id) {
-  await fetch(`${API_BASE_URL}/${id}`, { method: "DELETE" });
+  const userId = localStorage.getItem("userId");
+await fetch(`${API_BASE_URL}/${id}`, {
+  method: "DELETE",
+  headers: { "x-user-id": userId || "" }
+});
+
   fetchTodos();
 }
 
 async function updateTodo(id, data) {
-  await fetch(`${API_BASE_URL}/${id}`, {
-    method: "PUT",
-    credentials: "include",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data)
-  });
+  const userId = localStorage.getItem("userId");
+await fetch(`${API_BASE_URL}/${id}`, {
+  method: "PUT",
+  headers: { 
+    "Content-Type": "application/json",
+    "x-user-id": userId || ""
+  },
+  body: JSON.stringify(data)
+});
+
 
   exitEditMode();
   fetchTodos();
@@ -260,12 +279,17 @@ if (loginSubmit) {
     const email = document.getElementById("loginEmail").value;
     const password = document.getElementById("loginPassword").value;
 
-    const res = await fetch("/api/auth/login", {
-      method: "POST",
-      credentials: "include",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password })
-    });
+    const res = await fetch("/.netlify/functions/auth-login", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ email, password })
+});
+
+if (res.ok) {
+  const data = await res.json();
+  localStorage.setItem("userId", data.userId);
+}
+
 
   if (res.ok) {
     const user = await res.json();
@@ -292,10 +316,12 @@ userEmailDiv.addEventListener("click", (e) => {
 
 
 logoutBtn.addEventListener("click", async () => {
-  await fetch("/api/auth/logout", {
-    method: "POST",
-    credentials: "include"
-  });
+ await fetch("/.netlify/functions/auth-logout", {
+  method: "POST",
+  headers: { "x-user-id": localStorage.getItem("userId") || "" }
+});
+localStorage.removeItem("userId");
+
   window.location.reload();
 });
 
@@ -983,5 +1009,6 @@ userPopup.addEventListener("click", e => e.stopPropagation());
 
 
 initApp();
+
 
 
