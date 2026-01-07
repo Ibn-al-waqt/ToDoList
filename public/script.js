@@ -39,7 +39,6 @@ const allTagsSection = document.getElementById("allTagsSection");
 
 const noteDateInput = document.getElementById("noteDate");
 
-import { supabase } from "../src/supabaseClient.js";
 
 
 
@@ -54,7 +53,8 @@ let editingNoteCard = null;
 loginPopup.addEventListener("click", e => e.stopPropagation());
 loginPopup.addEventListener("mousedown", e => e.stopPropagation());
 
-const API_BASE_URL = "/.netlify/functions/todos";
+const API_BASE_URL = "/.netlify/functions";
+
 
 
 // ================= API =================
@@ -112,47 +112,34 @@ registerSubmit.addEventListener("click", async () => {
   const email = document.getElementById("registerEmail").value;
   const password = document.getElementById("registerPassword").value;
 
-  const res = await fetch("/.netlify/functions/auth-register", {
-  method: "POST",
-  headers: { "Content-Type": "application/json" },
-  body: JSON.stringify({ email, password })
-});
+  const { data, error } = await supabase.auth.signUp({
+    email,
+    password
+  });
 
-// auto-login
-const loginRes = await fetch("/.netlify/functions/auth-login", {
-  method: "POST",
-  headers: { "Content-Type": "application/json" },
-  body: JSON.stringify({ email, password })
-});
-
-if (loginRes.ok) {
-  const data = await loginRes.json();
-  localStorage.setItem("userId", data.userId); // store ID for future requests
-}
-
-
-  if (!loginRes.ok) {
-    alert("Registered, but login failed");
+  if (error) {
+    alert("Registration failed");
     return;
   }
 
-  const user = await loginRes.json();
   loginPopup.classList.add("hidden");
-  setLoggedInUI(user);
+  setLoggedInUI(data.user);
   await fetchTodos();
 });
 
+
+
+
 // Fetch todos from backend API
 async function fetchTodos() {
-  const userId = localStorage.getItem("userId");
-const res = await fetch(API_BASE_URL, {
-  headers: { "x-user-id": userId || "" }
-});
-  if (res.status === 401) {
-    notesState = []; // ensure it's an array
-    renderNotesFromState();
-    return;
-  }
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session) return;
+
+  const res = await fetch(`${API_BASE_URL}/todos-get`, {
+    headers: {
+      Authorization: `Bearer ${session.access_token}`
+    }
+  });
 
   const data = await res.json();
   notesState = Array.isArray(data) ? data : [];
@@ -160,45 +147,54 @@ const res = await fetch(API_BASE_URL, {
 }
 
 
-async function createTodo(todo) {
-  const userId = localStorage.getItem("userId");
-await fetch(API_BASE_URL, {
-  method: "POST",
-  headers: { 
-    "Content-Type": "application/json",
-    "x-user-id": userId || ""
-  },
-  body: JSON.stringify(todo)
-});
 
-  fetchTodos();
+async function createTodo(todo) {
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session) return;
+
+  await fetch(`${API_BASE_URL}/todos-create`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${session.access_token}`
+    },
+    body: JSON.stringify(todo)
+  });
+
+  await fetchTodos();
 }
 
 async function deleteTodo(id) {
-  const userId = localStorage.getItem("userId");
-await fetch(`${API_BASE_URL}/${id}`, {
-  method: "DELETE",
-  headers: { "x-user-id": userId || "" }
-});
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session) return;
 
-  fetchTodos();
+  await fetch(`${API_BASE_URL}/todos-delete/${id}`, {
+    method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${session.access_token}`
+    }
+  });
+
+  await fetchTodos();
 }
 
 async function updateTodo(id, data) {
-  const userId = localStorage.getItem("userId");
-await fetch(`${API_BASE_URL}/${id}`, {
-  method: "PUT",
-  headers: { 
-    "Content-Type": "application/json",
-    "x-user-id": userId || ""
-  },
-  body: JSON.stringify(data)
-});
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session) return;
 
+  await fetch(`${API_BASE_URL}/todos-update/${id}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${session.access_token}`
+    },
+    body: JSON.stringify(data)
+  });
 
   exitEditMode();
-  fetchTodos();
+  await fetchTodos();
 }
+
 
 
 function clearUserState() {
@@ -242,28 +238,23 @@ if (loginSubmit) {
     const email = document.getElementById("loginEmail").value;
     const password = document.getElementById("loginPassword").value;
 
-    const res = await fetch("/.netlify/functions/auth-login", {
-  method: "POST",
-  headers: { "Content-Type": "application/json" },
-  body: JSON.stringify({ email, password })
-});
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password
+    });
 
-if (res.ok) {
-  const data = await res.json();
-  localStorage.setItem("userId", data.userId);
-}
-
-
-  if (res.ok) {
-    const user = await res.json();
-    loginPopup.classList.add("hidden");
-    setLoggedInUI(user);
-    await fetchTodos();
-  } else {
+    if (error) {
       alert("Login failed");
-  }
+      return;
+    }
+
+    loginPopup.classList.add("hidden");
+    setLoggedInUI(data.user);
+    await fetchTodos();
   });
 }
+
+
 
 userIcon.addEventListener("click", (e) => {
   e.stopPropagation();
@@ -279,13 +270,10 @@ userEmailDiv.addEventListener("click", (e) => {
 
 
 logoutBtn.addEventListener("click", async () => {
- await fetch("/.netlify/functions/auth-logout", {
-  method: "POST",
-  headers: { "x-user-id": localStorage.getItem("userId") || "" }
-});
-localStorage.removeItem("userId");
+await supabase.auth.signOut();
+setLoggedOutUI();
+clearUserState();
 
-  window.location.reload();
 });
 
 
@@ -300,7 +288,7 @@ function selectTagSpan(span) {
   try { fullTags.prepend(span); } catch (e) {}
   updateNotesVisibility();
   // Persist active filters
-  saveFilters();
+ 
 }
 function deselectTagSpan(span) {
   if (!span || !span.dataset) return;
@@ -310,7 +298,7 @@ function deselectTagSpan(span) {
   span.classList.remove('active-filter');
   updateNotesVisibility();
   // Persist active filters
-  saveFilters();
+
 }
 function toggleFilterForSpan(span) {
   if (!span || !span.dataset) return;
@@ -322,7 +310,7 @@ function toggleFilterForSpan(span) {
     selectTagSpan(span);
   }
   // Persist active filters (safety if selection logic changes)
-  saveFilters();
+
 }
 function ensureFullTagClickable(span) {
   if (!span || span._clickable) return;
@@ -402,23 +390,6 @@ function updateFullTagCount(text) {
   }
 }
 
-// Persist/restore active tag filters to localStorage so selections survive reloads
-function saveFilters() {
-  try {
-    const arr = Array.from(activeFilterTags);
-    localStorage.setItem(TAG_FILTER_KEY, JSON.stringify(arr));
-  } catch (e) { /* ignore storage errors */ }
-}
-
-function loadFilters() {
-  try {
-    const raw = localStorage.getItem(TAG_FILTER_KEY);
-    if (!raw) return;
-    const arr = JSON.parse(raw);
-    if (!Array.isArray(arr)) return;
-    arr.forEach(t => activeFilterTags.add(t));
-  } catch (e) { /* ignore parse errors */ }
-}
 
 function escapeHtml(str) {
   if (!str) return "";
@@ -623,24 +594,6 @@ function exitEditMode() {
   tempTags.innerHTML = '';
 }
 
-// === [Serializer] Capture current DOM into notesState and save ===
-function serializeNotesFromDOM() {
-  const cards = Array.from(document.querySelectorAll('.note'));
-  notesState = cards.map(card => {
-    // Title text is the text content before the remove button
-    const header = card.querySelector('.note-header');
-    let title = '';
-    if (header) {
-      const nodes = Array.from(header.childNodes).filter(n => n.nodeType === Node.TEXT_NODE);
-      title = nodes.length ? nodes.map(n => n.textContent).join('').trim() : header.textContent.replace('✖','').trim();
-    }
-    const bodyEl = card.querySelector('.note-back .note-body p');
-    const body = bodyEl ? bodyEl.innerHTML.replace(/<br\s*\/?>/gi, '\n') : '';
-    const tags = Array.from(card.querySelectorAll('.note-tags span[data-tag]')).map(s => s.dataset.tag);
-    return { title, body, tags};
-  });
-  
-}
 
 // === [Renderer] Build notes from saved state ===
 function renderNotesFromState() {
@@ -869,7 +822,7 @@ if (taskBtn) {
 // Initialize flip/read-more handlers and clipping for existing notes on the page
 function initExistingNotes() {
   // restore persisted filters before initializing UI
-  loadFilters();
+
   const notes = Array.from(document.querySelectorAll('.note'));
   notes.forEach(card => {
     // attach remove handler if present
@@ -927,36 +880,26 @@ function initExistingNotes() {
   }
 }
 
-// --- Persistence hook: wrap removeTagAndFull to save after tag removal ---
-const _original_removeTagAndFull = removeTagAndFull;
-removeTagAndFull = function(tagEl) {
-  _original_removeTagAndFull(tagEl); // original behavior
-  serializeNotesFromDOM();           // persist current notes after tag removal
-};
 
-// run on load
-document.addEventListener('DOMContentLoaded', initExistingNotes);
 
-// Render notes from saved state on load (clears placeholders and rebuilds)
-document.addEventListener('DOMContentLoaded', () => {
-  checkAuthAndUpdateUI();
-});
+document.addEventListener('DOMContentLoaded', async () => {
+  await checkAuthAndUpdateUI();
 
-// Wire navbar search input after DOM ready
-document.addEventListener('DOMContentLoaded', () => {
   const search = document.getElementById('navSearch');
-  if (!search) return;
-  search.addEventListener('input', (e) => {
-    currentSearchQuery = e.target.value || '';
-    updateNotesVisibility();
-  });
-  search.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') {
-      search.value = '';
-      currentSearchQuery = '';
+  if (search) {
+    search.addEventListener('input', (e) => {
+      currentSearchQuery = e.target.value || '';
       updateNotesVisibility();
-    }
-  });
+    });
+
+    search.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        search.value = '';
+        currentSearchQuery = '';
+        updateNotesVisibility();
+      }
+    });
+  }
 });
 
 
@@ -968,9 +911,6 @@ document.addEventListener("click", () => {
 
 loginPopup.addEventListener("click", e => e.stopPropagation());
 userPopup.addEventListener("click", e => e.stopPropagation());
-
-
-
-
-
-
+document.addEventListener('DOMContentLoaded', () => {
+  initExistingNotes();
+});
