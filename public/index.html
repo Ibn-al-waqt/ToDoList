@@ -172,7 +172,14 @@
     <!--<script type="module" src="./js/main.js"></script>-->
     
 <!-- Make sure script type="module" or use window.supabase -->
-<script src="/src/supabaseClient.js"></script>
+    <!-- Add in <head> or just before your scripts -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/supabase.min.js"></script>
+<script>
+// Browser-ready Supabase client
+const supabaseUrl = "https://sazdtrcayjljgmihilkj.supabase.co";
+const supabaseKey = "YOUR_SUPABASE_ANON_KEY"; // anon key
+const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+</script>
 <script type="module" src="/script.js"></script>
 
 
@@ -181,6 +188,7 @@
 </body>
 
 </html>
+
 
 
 
