@@ -64,7 +64,7 @@ loginPopup.addEventListener("mousedown", e => e.stopPropagation());
 
 const API_BASE_URL = "https://todolist-1-p5d8.onrender.com";
 // Base URL for backend API (deployed on Render)
-
+const API_BASE_URL = "/api/todos";
 
 // ================= API =================
 // Load user info on page load
@@ -983,4 +983,5 @@ userPopup.addEventListener("click", e => e.stopPropagation());
 
 
 initApp();
+
 
