@@ -5,11 +5,11 @@ const supabaseUrl = "https://sazdtrcayjljgmihilkj.supabase.co"; // your Supabase
 const supabaseKey = "sb_publishable_8PjevXnceWHX2i_xoB-M7g_UYzHxq5c"; // your anon key
 
 if (!supabaseUrl || !supabaseKey) {
-  throw new Error("Missing Supabase environment variables");
+  throw new Error("Missing Supabase credentials");
 }
 
-// Create Supabase client
-const supabase = supabase.createClient
+// Create the client
+window.supabase = supabase.createClient
   ? supabase.createClient(supabaseUrl, supabaseKey)
   : supabaseJs.createClient(supabaseUrl, supabaseKey);
 
