@@ -60,7 +60,8 @@ let guestNotes = [];
 loginPopup.addEventListener("click", e => e.stopPropagation());
 loginPopup.addEventListener("mousedown", e => e.stopPropagation());
 
-const API_BASE_URL = "http://localhost:3000/api/todos";
+//const API_BASE_URL = "http://localhost:3000/api/todos";
+const API_BASE_URL = "/api/todos";
 
 // ================= API =================
 // Load user info on page load
@@ -971,6 +972,7 @@ document.addEventListener("click", () => {
 
 loginPopup.addEventListener("click", e => e.stopPropagation());
 userPopup.addEventListener("click", e => e.stopPropagation());
+
 
 
 initApp();
