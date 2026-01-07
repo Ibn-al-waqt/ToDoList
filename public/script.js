@@ -113,8 +113,13 @@ showLoginBtn.addEventListener("click", showLoginForm);
 showRegisterBtn.addEventListener("click", showRegisterForm);
 
 registerSubmit.addEventListener("click", async () => {
-  const email = document.getElementById("registerEmail").value;
-  const password = document.getElementById("registerPassword").value;
+  const email = document.getElementById("registerEmail").value.trim();
+  const password = document.getElementById("registerPassword").value.trim();
+
+  if (!email || !password) {
+    alert("Please enter email and password (6+ chars)");
+    return;
+  }
 
   const { data, error } = await supabase.auth.signUp({
     email,
@@ -122,7 +127,7 @@ registerSubmit.addEventListener("click", async () => {
   });
 
   if (error) {
-    alert("Registration failed");
+    alert(`Registration failed: ${error.message}`);
     return;
   }
 
@@ -918,6 +923,7 @@ userPopup.addEventListener("click", e => e.stopPropagation());
 document.addEventListener('DOMContentLoaded', () => {
   initExistingNotes();
 });
+
 
 
 
