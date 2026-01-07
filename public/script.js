@@ -40,7 +40,8 @@ const allTagsSection = document.getElementById("allTagsSection");
 const noteDateInput = document.getElementById("noteDate");
 
 
-import { supabase } from './supabaseClient.js'; // path relative to script.js
+import { supabase } from './src/supabaseClient.js';
+
 
 //import { supabase } from "./supabaseClientBrowser.js";
 // active filter tags (multi-select) - notes must contain ALL tags in this set to be shown
@@ -916,6 +917,7 @@ userPopup.addEventListener("click", e => e.stopPropagation());
 document.addEventListener('DOMContentLoaded', () => {
   initExistingNotes();
 });
+
 
 
 
