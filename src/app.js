@@ -14,15 +14,12 @@ app.use(cors({ origin: "*", credentials: true }));
 app.use(express.json());
 
 app.use(session({
-  store: new pgStore({
-    pool: supabaseClient.pool,  // supply a Postgres pool if available
-    tableName: 'session'
-  }),
   secret: process.env.SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
-  cookie: { secure: true } // secure true if using HTTPS
+  cookie: { secure: false }
 }));
+
 
 // Auth routes
 app.post("/api/register", authController.register);
@@ -36,6 +33,7 @@ app.delete("/api/todos/:id", todosController.deleteTodo);
 app.put("/api/todos/:id", todosController.updateTodo);
 
 export default app;
+
 
 
 
