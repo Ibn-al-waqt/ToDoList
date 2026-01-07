@@ -11,28 +11,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Google+Sans+Code:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Charm:wght@400;700&display=swap" rel="stylesheet">
 
-    
-<!-- 1) Create the Supabase client early -->
-    <script type="module">
-      import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
-
-      // TODO: replace with your actual project values
-      const SUPABASE_URL = 'https://sazdtrcayjljgmihilkj.supabase.co';
-      const SUPABASE_ANON_KEY = 'sb_publishable_8PjevXnceWHX2i_xoB-M7g_UYzHxq5c';
-
-      const client = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-        auth: {
-          persistSession: true,
-          autoRefreshToken: true,
-          detectSessionInUrl: true,
-        },
-      });
-
-      // Expose to your non-module app code
-      window.supabase = client;
-    </script>
-
-
 </head>
 <body>
     
@@ -105,22 +83,22 @@
     <div class="note-grid"></div>
 </div>
 
-<!-- 1. Supabase JS CDN -->
+<!-- Only this, before your script.js -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/supabase.min.js"></script>
-
-<!-- 2. Supabase client setup -->
 <script>
-  // Use the global Supabase object from the CDN
-  const supabaseUrl = "https://sazdtrcayjljgmihilkj.supabase.co";
-  const supabaseKey = "sb_publishable_8PjevXnceWHX2i_xoB-M7g_UYzHxq5c"; // replace with your anon key
-  const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+  window.supabase = supabase.createClient(
+    "https://sazdtrcayjljgmihilkj.supabase.co",
+    "sb_publishable_8PjevXnceWHX2i_xoB-M7g_UYzHxq5c"
+  );
 </script>
 
-<!-- 3. Main script -->
+<!-- Then your main script -->
 <script type="module" src="script.js"></script>
+
 
 </body>
 </html>
+
 
 
 
