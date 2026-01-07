@@ -1,12 +1,6 @@
-import { createClient } from '@supabase/supabase-js';
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
 
-// For browser client, use anon key
-const supabaseUrl = process.env.SUPABASE_URL;
-const supabaseKey = process.env.SUPABASE_ANON_KEY;  // change this
-
-if (!supabaseUrl || !supabaseKey) {
-  throw new Error('Missing Supabase environment variables');
-}
+const supabaseUrl = 'https://sazdtrcayjljgmihilkj.supabase.co';
+const supabaseKey = 'sb_publishable_8PjevXnceWHX2i_xoB-M7g_UYzHxq5c'; // public anon key
 
 export const supabase = createClient(supabaseUrl, supabaseKey);
-
