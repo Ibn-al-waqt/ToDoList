@@ -251,27 +251,28 @@
   transform: scale(1.05);
   box-shadow: 0px 0px 20px rgba(87, 199, 255, 0.7); /* light blue glow */
 }
-/* Pulsing glow for footer and header */
+
+/* Add this to your note.css */
 @keyframes pulse-red {
-  0%, 100% { box-shadow: 0 0 8px #ff5555; }
-  50% { box-shadow: 0 0 16px #ff5555; }
+  0% { box-shadow: 0 0 0px #ff5555; }
+  50% { box-shadow: 0 0 10px #ff5555; }
+  100% { box-shadow: 0 0 0px #ff5555; }
 }
 
 @keyframes pulse-yellow {
-  0%, 100% { box-shadow: 0 0 8px rgb(255, 202, 28); }
-  50% { box-shadow: 0 0 16px rgb(255, 202, 28); }
+  0% { box-shadow: 0 0 0px rgb(255, 202, 28); }
+  50% { box-shadow: 0 0 10px rgb(255, 202, 28); }
+  100% { box-shadow: 0 0 0px rgb(255, 202, 28); }
 }
 
-/* Classes to trigger pulse */
-.pulse-red {
-  background-color: #ff5555 !important;
-  animation: pulse-red 1s infinite;
+.note-pulse-red {
+  animation: pulse-red 1.2s infinite ease-in-out;
 }
 
-.pulse-yellow {
-  background-color: rgb(255, 202, 28) !important;
-  animation: pulse-yellow 1s infinite;
+.note-pulse-yellow {
+  animation: pulse-yellow 1.2s infinite ease-in-out;
 }
+
 
 
 
@@ -281,6 +282,7 @@
   border-radius: 2px;
   padding: 0 2px;
 }
+
 
 
 
