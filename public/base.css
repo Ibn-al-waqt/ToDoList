@@ -592,6 +592,10 @@ button.danger:hover {
   transform: scale(1.05);
 }
 
+.instructions-box ul li {
+  margin-bottom: 8px;
+}
+
 
 
 
