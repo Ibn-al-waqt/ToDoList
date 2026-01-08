@@ -271,10 +271,11 @@
 }
 
 .highlight {
-  background-color: #fffa65; /* soft yellow */
+  background-color: rgb(255, 202, 28); /* soft yellow */
   border-radius: 2px;
   padding: 0 2px;
 }
+
 
 
 
