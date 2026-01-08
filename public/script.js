@@ -39,7 +39,7 @@ const noteCreationSection = document.getElementById("noteCreationSection");
 const allTagsSection = document.getElementById("allTagsSection");
 
 const noteDateInput = document.getElementById("noteDate");
-const supabase = window.supabase;
+//const supabase = window.supabase;
 
 const SUPABASE_URL = "https://sazdtrcayjljgmihilkj.supabase.co";  // replace with your Supabase URL
 const SUPABASE_ANON_KEY = "sb_publishable_8PjevXnceWHX2i_xoB-M7g_UYzHxq5c"; // replace with your public anon key
@@ -966,6 +966,7 @@ async function checkSession() {
 }
 
 document.addEventListener("DOMContentLoaded", checkSession);
+
 
 
 
