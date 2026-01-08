@@ -226,10 +226,10 @@
 .note-tags span {
   background: #6a11cb;
   color: white;
-  padding: 4px 8px;
+  padding: 5px 8px;
   border-radius: 6px;
   font-size: 12px;
-  margin-bottom: -6px;
+  margin-bottom: -8px;
 }
 
 
@@ -251,6 +251,7 @@
   transform: scale(1.05);
   box-shadow: 0px 0px 20px rgba(87, 199, 255, 0.7); /* light blue glow */
 }
+
 
 
 
