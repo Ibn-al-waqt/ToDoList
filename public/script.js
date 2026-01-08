@@ -296,6 +296,34 @@ loginPopup.addEventListener("click", (e) => {
   e.stopPropagation();
 });
 
+// Returns a semi-transparent gradient for due date urgency
+function getDueDateGradient(dueDateStr) {
+  if (!dueDateStr) return ''; // no due date, keep default
+
+  const today = new Date();
+  const dueDate = new Date(dueDateStr);
+  const diffTime = dueDate - today;
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+  // Map daysLeft to percentage red vs blue
+  let redPercent;
+  if (diffDays <= 0) {
+    redPercent = 100; // overdue: full red
+  } else if (diffDays >= 10) {
+    redPercent = 0; // more than 10 days: full blue
+  } else {
+    redPercent = (10 - diffDays) * 10; // 1 day → 90%, 2 days → 80%, etc.
+  }
+
+  const bluePercent = 100 - redPercent;
+
+  // Use rgba for red transparency
+  const redColor = 'rgba(255, 0, 0, 0.5)'; // semi-transparent red
+  const blueColor = '#57c7ff';           // your blue
+
+  return `linear-gradient(to right, ${redColor} ${redPercent}%, ${blueColor} ${bluePercent}%)`;
+}
+
 
 
 function updateNotesVisibility() {
@@ -595,6 +623,13 @@ function createNoteCardFromData(noteObj) {
     if (noteTagContainer.scrollWidth > noteTagContainer.clientWidth + 1) noteTagContainer.classList.add('show-scroll'); else noteTagContainer.classList.remove('show-scroll');
   }
 
+  const footer = card.querySelector(".note-footer");
+  if (footer) {
+    footer.style.background = getDueDateGradient(noteObj.due_date);
+    footer.style.color = '#fff'; // optional: make text stand out on gradient
+    footer.style.padding = '4px 8px'; // ensure readability
+    //footer.style.borderRadius = '0 0 6px 6px'; // optional: match note corners
+  }
 
 
   // Respect any active filters after render
@@ -999,5 +1034,6 @@ document.addEventListener("click", () => {
 window.addEventListener('beforeunload', async () => {
   await supabase.auth.signOut();
 });
+
 
 
