@@ -679,12 +679,6 @@ function createNoteCardFromData(noteObj) {
 }
 
 
-
-
-  
-}
-
-
   // Respect any active filters after render
   updateNotesVisibility();
 
@@ -1087,6 +1081,7 @@ document.addEventListener("click", () => {
 window.addEventListener('beforeunload', async () => {
   await supabase.auth.signOut();
 });
+
 
 
 
