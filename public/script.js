@@ -992,9 +992,10 @@ async function checkSession() {
 
 document.addEventListener("DOMContentLoaded", checkSession);
 document.addEventListener("DOMContentLoaded", () => {
-  const searchInput = document.querySelector("#searchInput"); // adjust selector
+  const searchInput = document.querySelector("#navSearch"); // adjust selector
   if (searchInput) searchInput.value = ""; // empty it on page load
 });
+
 
 
 
