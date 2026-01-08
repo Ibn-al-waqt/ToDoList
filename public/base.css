@@ -598,7 +598,10 @@ button.danger:hover {
 
 .instructions-box ul li:hover {
     color: rgba(87, 199, 255, 0.7);
+    transition: color 0.2s ease;
+    cursor:pointer
 }
+
 
 
 
