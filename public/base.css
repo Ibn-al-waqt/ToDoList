@@ -583,4 +583,15 @@ button.danger:hover {
   color: #ff7777;
 }
 
+#PageTitle {
+  cursor: pointer;
+  transition: transform 0.15s ease, color 0.15s ease;
+}
+
+#PageTitle:hover {
+  transform: scale(1.05);
+}
+
+
+
 
