@@ -658,10 +658,20 @@ function createNoteCardFromData(noteObj) {
 
   const footer = card.querySelector(".note-footer");
   if (footer && noteObj.due_date) {
-    footer.style.background = getDueDateGradient(noteObj.due_date); // gradient with hard stop
-    footer.style.color = '#fff';
-    footer.style.padding = '4px 8px';
+  footer.style.background = getDueDateGradient(noteObj.due_date);
+
+  const today = new Date();
+  const dueDate = new Date(noteObj.due_date);
+  const diffDays = Math.ceil((dueDate - today) / (1000 * 60 * 60 * 24));
+
+  // Pulse if overdue or due today
+  if (diffDays <= 0) {
+    footer.classList.add('pulse');
+  } else {
+    footer.classList.remove('pulse');
   }
+}
+
 
 
 
@@ -1067,6 +1077,7 @@ document.addEventListener("click", () => {
 window.addEventListener('beforeunload', async () => {
   await supabase.auth.signOut();
 });
+
 
 
 
