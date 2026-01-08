@@ -270,6 +270,13 @@
   animation: pulse-red 1s infinite;
 }
 
+.highlight {
+  background-color: #fffa65; /* soft yellow */
+  border-radius: 2px;
+  padding: 0 2px;
+}
+
+
 
 
 
