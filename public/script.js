@@ -664,15 +664,25 @@ function createNoteCardFromData(noteObj) {
   const dueDate = new Date(noteObj.due_date);
   const diffDays = Math.ceil((dueDate - today) / (1000 * 60 * 60 * 24));
 
+  const header = card.querySelector('.note-header');
+
   // Pulse if overdue or due today
   if (diffDays <= 0) {
-    footer.classList.add('pulse');
+    footer.classList.add('pulse');  // footer red pulse
+    if (header) header.classList.add('pulse'); // header pulse too
   } else {
     footer.classList.remove('pulse');
+    if (header) header.classList.remove('pulse');
   }
+
+    
 }
 
 
+
+
+  
+}
 
 
   // Respect any active filters after render
@@ -1077,6 +1087,7 @@ document.addEventListener("click", () => {
 window.addEventListener('beforeunload', async () => {
   await supabase.auth.signOut();
 });
+
 
 
 
