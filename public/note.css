@@ -252,25 +252,14 @@
   box-shadow: 0px 0px 20px rgba(87, 199, 255, 0.7); /* light blue glow */
 }
 
-/* Add this to your note.css */
 @keyframes pulse-red {
-  0% { box-shadow: 0 0 0px #ff5555; }
-  50% { box-shadow: 0 0 10px #ff5555; }
-  100% { box-shadow: 0 0 0px #ff5555; }
+  0% { box-shadow: 0 0 6px #ff5555; }
+  50% { box-shadow: 0 0 18px #ff5555; }
+  100% { box-shadow: 0 0 6px #ff5555; }
 }
 
-@keyframes pulse-yellow {
-  0% { box-shadow: 0 0 0px rgb(255, 202, 28); }
-  50% { box-shadow: 0 0 10px rgb(255, 202, 28); }
-  100% { box-shadow: 0 0 0px rgb(255, 202, 28); }
-}
-
-.note-pulse-red {
-  animation: pulse-red 1.2s infinite ease-in-out;
-}
-
-.note-pulse-yellow {
-  animation: pulse-yellow 1.2s infinite ease-in-out;
+.note.overdue {
+  animation: pulse-red 1.2s infinite;
 }
 
 
@@ -282,6 +271,7 @@
   border-radius: 2px;
   padding: 0 2px;
 }
+
 
 
 
