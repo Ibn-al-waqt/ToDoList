@@ -199,16 +199,22 @@ async function fetchTodos() {
     return;
   }
 
-  const res = await fetch(`${API_BASE_URL}/todos-get`, {
-    headers: {
-      Authorization: `Bearer ${session.access_token}`
-    }
-  });
+  const {
+    data: todos,
+    error
+  } = await supabase
+    .from("Todos")
+    .select("*")
+    .eq("user_id", session.user.id);
 
-  const data = await res.json();
-  console.log("Fetched todos:", data); // <-- ADD THIS
+  if (error) {
+    console.error("Failed to fetch todos:", error.message);
+    return;
+  }
 
-  notesState = Array.isArray(data) ? data : [];
+  console.log("Fetched todos:", todos); // <-- ADD THIS
+
+  notesState = Array.isArray(todos) ? todos : [];
   renderNotesFromState();
 }
 
@@ -968,21 +974,3 @@ async function checkSession() {
 }
 
 document.addEventListener("DOMContentLoaded", checkSession);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
