@@ -27,6 +27,11 @@ const userPopup = document.getElementById("userPopup");
 const userEmailDiv = document.getElementById("userEmail");
 const logoutBtn = document.getElementById("logoutBtn");
 
+const pageTitle = document.getElementById("PageTitle");
+const instructionsOverlay = document.getElementById("instructionsOverlay");
+const closeInstructions = document.getElementById("closeInstructions");
+
+
 
 const showLoginBtn = document.getElementById("showLogin");
 const showRegisterBtn = document.getElementById("showRegister");
@@ -507,6 +512,27 @@ function nl2br(str) {
   if (!str) return "";
   return str.replace(/\n/g, "<br>");
 }
+
+// Open instructions modal
+pageTitle.addEventListener("click", (e) => {
+  e.stopPropagation();
+  instructionsOverlay.classList.remove("hidden");
+});
+
+// Close modal (X button)
+closeInstructions.addEventListener("click", () => {
+  instructionsOverlay.classList.add("hidden");
+});
+
+// Click outside modal closes it
+instructionsOverlay.addEventListener("click", () => {
+  instructionsOverlay.classList.add("hidden");
+});
+
+// Prevent inner clicks from closing
+document.getElementById("instructionsModal")
+  .addEventListener("click", e => e.stopPropagation());
+
 
 
 // === [Factory] Build a note card from saved data (structure preserved) ===
@@ -1041,6 +1067,7 @@ document.addEventListener("click", () => {
 window.addEventListener('beforeunload', async () => {
   await supabase.auth.signOut();
 });
+
 
 
 
