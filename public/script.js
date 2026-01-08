@@ -298,31 +298,38 @@ loginPopup.addEventListener("click", (e) => {
 
 // Returns a semi-transparent gradient for due date urgency
 function getDueDateGradient(dueDateStr) {
-  if (!dueDateStr) return ''; // no due date, keep default
+  if (!dueDateStr) return ''; // no due date
 
   const today = new Date();
   const dueDate = new Date(dueDateStr);
   const diffTime = dueDate - today;
   const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
-  // Map daysLeft to percentage red vs blue
   let redPercent;
-  if (diffDays <= 0) {
-    redPercent = 100; // overdue: full red
-  } else if (diffDays >= 10) {
-    redPercent = 0; // more than 10 days: full blue
-  } else {
-    redPercent = (10 - diffDays) * 10; // 1 day → 90%, 2 days → 80%, etc.
-  }
+  if (diffDays <= 0) redPercent = 100;   // overdue: full red
+  else if (diffDays >= 10) redPercent = 0; // more than 10 days: full blue
+  else redPercent = (10 - diffDays) * 10;  // 1 day → 90%, 2 days → 80%
 
-  const bluePercent = 100 - redPercent;
+  // Colors
+  const redColor = 'rgba(255, 0, 0, 0.8)';
+  const blueColor = '#57c7ff';
 
-  // Use rgba for red transparency
-  const redColor = 'rgba(255, 0, 0, 0.5)'; // semi-transparent red
-  const blueColor = '#57c7ff';           // your blue
+  // Add a tiny transition/fade at the edge (1% of the width)
+  const fade = 1; // 1% fade for smooth edge
 
-  return `linear-gradient(to right, ${redColor} ${redPercent}%, ${blueColor} ${bluePercent}%)`;
+  // Clamp percentages for gradient stops
+  const redEnd = Math.min(redPercent, 100);
+  const blueStart = Math.max(redPercent - fade, 0);
+
+  return `linear-gradient(to right, 
+           ${redColor} 0%, 
+           ${redColor} ${blueStart}%, 
+           ${redColor} ${redEnd}%, 
+           ${blueColor} ${redEnd}%, 
+           ${blueColor} 100%)`;
 }
+
+
 
 
 
@@ -624,12 +631,12 @@ function createNoteCardFromData(noteObj) {
   }
 
   const footer = card.querySelector(".note-footer");
-  if (footer) {
-    footer.style.background = getDueDateGradient(noteObj.due_date);
-    footer.style.color = '#fff'; // optional: make text stand out on gradient
-    footer.style.padding = '4px 8px'; // ensure readability
-    //footer.style.borderRadius = '0 0 6px 6px'; // optional: match note corners
+  if (footer && noteObj.due_date) {
+    footer.style.background = getDueDateGradient(noteObj.due_date); // gradient with hard stop
+    footer.style.color = '#fff';
+    footer.style.padding = '4px 8px';
   }
+
 
 
   // Respect any active filters after render
@@ -1034,6 +1041,7 @@ document.addEventListener("click", () => {
 window.addEventListener('beforeunload', async () => {
   await supabase.auth.signOut();
 });
+
 
 
 
