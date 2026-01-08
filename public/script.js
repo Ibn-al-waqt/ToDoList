@@ -698,7 +698,7 @@ const footer = card.querySelector(".note-footer");
 const header = card.querySelector(".note-header");
 
 if (footer && header) {
-  // remove any previous pulse classes
+  // Remove previous pulse classes
   footer.classList.remove("pulse-red", "pulse-yellow");
   header.classList.remove("pulse-red", "pulse-yellow");
 
@@ -706,35 +706,34 @@ if (footer && header) {
     const today = new Date();
     const dueDate = new Date(noteObj.due_date);
 
-    // Normalize dates to compare only year/month/day
-    const isToday = today.getFullYear() === dueDate.getFullYear() &&
-                    today.getMonth() === dueDate.getMonth() &&
-                    today.getDate() === dueDate.getDate();
+    // Normalize dates (ignore hours/minutes/seconds)
+    const todayYMD = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+    const dueYMD = new Date(dueDate.getFullYear(), dueDate.getMonth(), dueDate.getDate());
 
-    const diffDays = Math.floor((dueDate - today) / (1000 * 60 * 60 * 24));
+    const diffTime = dueYMD - todayYMD;
+    const diffDays = diffTime / (1000 * 60 * 60 * 24);
 
     if (diffDays < 0) {
       // Overdue → red pulse
       footer.classList.add("pulse-red");
       header.classList.add("pulse-red");
-    } else if (isToday) {
+    } else if (diffDays === 0) {
       // Due today → yellow pulse
       footer.classList.add("pulse-yellow");
       header.classList.add("pulse-yellow");
     } else {
-      // Future → regular gradient (no pulse)
+      // Future → normal gradient
       footer.style.background = getDueDateGradient(noteObj.due_date);
       footer.style.color = '#fff';
     }
   } else {
-    // No due date → regular color, no pulse
-    footer.style.background = ''; // remove any gradient
+    // No due date → normal color
+    footer.style.background = '';
     footer.style.color = '#fff';
   }
 
   footer.style.padding = '4px 8px';
 }
-
 
 
 
@@ -1141,6 +1140,7 @@ document.addEventListener("click", () => {
 window.addEventListener('beforeunload', async () => {
   await supabase.auth.signOut();
 });
+
 
 
 
