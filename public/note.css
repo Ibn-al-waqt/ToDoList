@@ -253,24 +253,29 @@
 }
 
 @keyframes pulse-red {
-  0% { box-shadow: 0 0 6px #ff5555; }
-  50% { box-shadow: 0 0 18px #ff5555; }
-  100% { box-shadow: 0 0 6px #ff5555; }
+  0%   { box-shadow: 0 0 4px 0 rgba(255, 85, 85, 0.4); }
+  50%  { box-shadow: 0 0 8px 2px rgba(255, 85, 85, 0.7); }
+  100% { box-shadow: 0 0 4px 0 rgba(255, 85, 85, 0.4); }
 }
 
-.note.overdue {
-  animation: pulse-red 1.2s infinite;
+/* Footer pulse */
+.note-footer.pulse {
+  animation: pulse-red 1s infinite;
 }
 
-
-
-
+/* Header pulse (entire header including title + buttons) */
+.note-header.pulse {
+  background-color: #ff5555;       /* red background for urgent header */
+  color: #fff;                     /* text/icons white for contrast */
+  animation: pulse-red 1s infinite;
+}
 
 .highlight {
   background-color: rgb(255, 202, 28); /* soft yellow */
   border-radius: 2px;
   padding: 0 2px;
 }
+
 
 
 
