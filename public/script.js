@@ -219,19 +219,24 @@ async function fetchTodos() {
 }
 
 
-
 async function createTodo(todo) {
   const { data: { session } } = await supabase.auth.getSession();
-  if (!session) return;
+  if (!session?.user) {
+    console.error("No active session");
+    return;
+  }
 
-  await fetch(`${API_BASE_URL}/todos-create`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${session.access_token}`
-    },
-    body: JSON.stringify(todo)
-  });
+  const { error } = await supabase
+    .from("Todos")
+    .insert({
+      ...todo,
+      user_id: session.user.id
+    });
+
+  if (error) {
+    console.error("Failed to create todo:", error.message);
+    return;
+  }
 
   await fetchTodos();
 }
@@ -974,3 +979,4 @@ async function checkSession() {
 }
 
 document.addEventListener("DOMContentLoaded", checkSession);
+
