@@ -114,7 +114,7 @@
 
 .note-excerpt {
     padding: 12px;
-    background: #ffce7e;
+    background: #ffd59e;
     color: #111;
     /* make excerpt expand to fill most of the front area */
     flex: 1 1 auto;
@@ -136,7 +136,7 @@
     bottom: 0;
     height: 56px;
     pointer-events: none;
-    background: linear-gradient(180deg, rgba(255,255,255,0), #ffce7e 85%);
+    background: linear-gradient(180deg, rgba(255,255,255,0), #ffd59e 85%);
     z-index: 1;
 }
 
@@ -176,7 +176,7 @@
 
 .note-body {
     padding: 12px;
-    background: #ffce7e;
+    background: #ffd59e;
     color: #111;
     overflow: auto; /* allow scrolling when content exceeds area */
     /* allow the body to grow a bit larger on the back */
@@ -185,7 +185,7 @@
 
 .note-body {
     padding: 12px;
-    background: #ffce7e;
+    background: #ffd59e;
     color: #111;
     overflow: auto; /* allow scrolling when content exceeds area */
     max-height: 240px;
@@ -275,6 +275,7 @@
   border-radius: 2px;
   padding: 0 2px;
 }
+
 
 
 
