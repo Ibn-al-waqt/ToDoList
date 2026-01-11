@@ -15,10 +15,10 @@ A full-stack note and task management application that allows users to create, t
 - Backend: Node.js, Express
 - Database: Supabase (PostgreSQL)
 - Authentication: JWT-based auth
-- Hosting: Render (backend)
+- Hosting: Netlify (backend)
 
 ## Architecture Overview
-Frontend communicates with a RESTful API hosted on Render.  
+Frontend communicates with a RESTful API hosted on Netlify.  
 The backend handles authentication, authorization, and data access.  
 Supabase provides a managed PostgreSQL database for persistent storage.
 
@@ -56,7 +56,7 @@ Tags are stored directly on todos to simplify queries and reduce schema complexi
 Secrets and credentials are stored using environment variables and are never exposed to the client.
 
 ## Deployment
-- Backend deployed on Render
+- Backend deployed on Netlify
 - Database hosted on Supabase
 
 ## Lessons Learned
